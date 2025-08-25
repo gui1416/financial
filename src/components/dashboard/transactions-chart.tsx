@@ -1,11 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { useEffect, useState } from "react"
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from "recharts"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
+import { useQuery } from "@tanstack/react-query"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ChartData {
  date: string
@@ -24,157 +26,140 @@ const chartConfig = {
  },
 }
 
-export function TransactionsChart() {
- const [data, setData] = useState<ChartData[]>([])
- const [isLoading, setIsLoading] = useState(true)
- const [period, setPeriod] = useState("30")
+const fetchChartData = async (period: number): Promise<ChartData[]> => {
+ const supabase = createClient();
+ const { data: { user } } = await supabase.auth.getUser();
 
- useEffect(() => {
-  async function fetchChartData() {
-   const supabase = createClient()
-   const {
-    data: { user },
-   } = await supabase.auth.getUser()
+ if (!user) throw new Error("Usuário não autenticado");
 
-   if (!user) return
+ const endDate = new Date();
+ const startDate = new Date();
+ startDate.setDate(startDate.getDate() - period);
 
-   // Get last N days based on period
-   const endDate = new Date()
-   const startDate = new Date()
-   startDate.setDate(startDate.getDate() - Number.parseInt(period))
+ const { data: transactions, error } = await supabase
+  .from("transactions")
+  .select("amount, type, date")
+  .eq("user_id", user.id)
+  .gte("date", startDate.toISOString().split("T")[0])
+  .lte("date", endDate.toISOString().split("T")[0])
+  .order("date", { ascending: true });
 
-   const { data: transactions } = await supabase
-    .from("transactions")
-    .select("amount, type, date")
-    .eq("user_id", user.id)
-    .gte("date", startDate.toISOString().split("T")[0])
-    .lte("date", endDate.toISOString().split("T")[0])
-    .order("date", { ascending: true })
+ if (error) throw error;
 
-   if (transactions) {
-    // Group by date
-    const groupedData: { [key: string]: { income: number; expenses: number } } = {}
+ const groupedData: { [key: string]: { income: number; expenses: number } } = {};
 
-    transactions.forEach((transaction) => {
-     const date = transaction.date
-     if (!groupedData[date]) {
-      groupedData[date] = { income: 0, expenses: 0 }
-     }
+ for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+  const dateKey = d.toISOString().split("T")[0];
+  groupedData[dateKey] = { income: 0, expenses: 0 };
+ }
 
-     if (transaction.type === "income") {
-      groupedData[date].income += Number(transaction.amount)
-     } else {
-      groupedData[date].expenses += Number(transaction.amount)
-     }
-    })
 
-    // Convert to chart format
-    const chartData = Object.entries(groupedData).map(([date, values]) => ({
-     date: new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-     income: values.income,
-     expenses: values.expenses,
-    }))
-
-    setData(chartData)
-   }
-
-   setIsLoading(false)
+ transactions.forEach((transaction) => {
+  const date = transaction.date;
+  if (!groupedData[date]) {
+   groupedData[date] = { income: 0, expenses: 0 };
   }
+  if (transaction.type === "income") {
+   groupedData[date].income += Number(transaction.amount);
+  } else {
+   groupedData[date].expenses += Number(transaction.amount);
+  }
+ });
 
-  fetchChartData()
- }, [period])
+ return Object.entries(groupedData).map(([date, values]) => ({
+  date: new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+  income: values.income,
+  expenses: values.expenses,
+ }));
+}
+
+export function TransactionsChart() {
+ const [period, setPeriod] = useState(30);
+ const { data = [], isLoading } = useQuery({
+  queryKey: ['transactionsChartData', period],
+  queryFn: () => fetchChartData(period)
+ });
+ const isMobile = useIsMobile();
 
  if (isLoading) {
   return (
-   <Card className="border-0 bg-card/50 backdrop-blur-sm">
-    <CardHeader className="pb-2 px-3 md:px-6 md:pb-3">
-     <CardTitle className="text-sm md:text-base">Fluxo de Caixa</CardTitle>
-     <CardDescription className="text-xs md:text-sm">Últimos {period} dias</CardDescription>
+   <Card className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <CardHeader>
+     <CardTitle>Fluxo de Caixa</CardTitle>
+     <CardDescription>Receitas e gastos no período</CardDescription>
     </CardHeader>
-    <CardContent className="pt-0 px-3 md:px-6">
-     <div className="h-[180px] md:h-[300px] bg-muted animate-pulse rounded" />
+    <CardContent>
+     <div className="h-[300px] bg-muted animate-pulse rounded" />
     </CardContent>
    </Card>
   )
  }
 
  return (
-  <Card className="border-0 bg-card/50 backdrop-blur-sm">
-   <CardHeader className="pb-2 px-3 md:px-6 md:pb-3">
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-     <div className="space-y-1">
-      <CardTitle className="text-sm md:text-base">Fluxo de Caixa</CardTitle>
-      <CardDescription className="text-xs md:text-sm">Últimos {period} dias</CardDescription>
-     </div>
-     <div className="flex gap-1 self-start sm:self-auto">
-      {["7", "30", "90"].map((days) => (
-       <Button
-        key={days}
-        variant={period === days ? "default" : "outline"}
-        size="sm"
-        className="h-6 px-2 text-xs md:h-7 md:px-3"
-        onClick={() => setPeriod(days)}
-       >
-        {days}d
-       </Button>
-      ))}
-     </div>
+  <Card className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+   <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+    <div>
+     <CardTitle>Fluxo de Caixa</CardTitle>
+     <CardDescription>Receitas e gastos no período selecionado</CardDescription>
     </div>
+    <Select value={String(period)} onValueChange={(value) => setPeriod(Number(value))}>
+     <SelectTrigger className="w-[180px]">
+      <SelectValue placeholder="Selecione o período" />
+     </SelectTrigger>
+     <SelectContent>
+      <SelectItem value="7">Últimos 7 dias</SelectItem>
+      <SelectItem value="30">Últimos 30 dias</SelectItem>
+      <SelectItem value="90">Últimos 90 dias</SelectItem>
+     </SelectContent>
+    </Select>
    </CardHeader>
-   <CardContent className="pt-0 px-3 md:px-6">
-    <ChartContainer config={chartConfig} className="h-[160px] md:h-[280px]">
-     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart
-       data={data}
-       margin={{
-        top: 5,
-        right: 5,
-        left: -20,
-        bottom: 0,
-       }}
-      >
+   <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+     <ResponsiveContainer>
+      <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: isMobile ? 30 : 10 }}>
+       <defs>
+        <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+         <stop offset="5%" stopColor="var(--color-income)" stopOpacity={0.8} />
+         <stop offset="95%" stopColor="var(--color-income)" stopOpacity={0.1} />
+        </linearGradient>
+        <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+         <stop offset="5%" stopColor="var(--color-expenses)" stopOpacity={0.8} />
+         <stop offset="95%" stopColor="var(--color-expenses)" stopOpacity={0.1} />
+        </linearGradient>
+       </defs>
+       <CartesianGrid vertical={false} strokeDasharray="3 3" />
        <XAxis
         dataKey="date"
-        axisLine={false}
         tickLine={false}
-        tick={{ fontSize: 10 }}
-        className="text-muted-foreground"
-        interval="preserveStartEnd"
-        minTickGap={20}
+        axisLine={false}
+        tickMargin={8}
+        angle={isMobile ? -45 : 0}
+        textAnchor={isMobile ? 'end' : 'middle'}
+        interval={isMobile ? Math.floor(period / 4) : Math.floor(period / 10)}
+        height={isMobile ? 50 : 30}
        />
        <YAxis
-        axisLine={false}
         tickLine={false}
-        tick={{ fontSize: 10 }}
-        className="text-muted-foreground"
-        width={30}
-        tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+        axisLine={false}
+        tickMargin={8}
+        tickFormatter={(value) => `$${value / 1000}k`}
        />
-       <ChartTooltip
-        content={<ChartTooltipContent />}
-        labelFormatter={(value) => `Data: ${value}`}
-        formatter={(value: number, name: string) => [
-         `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-         chartConfig[name as keyof typeof chartConfig]?.label || name,
-        ]}
-       />
+       <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
        <Area
         type="monotone"
         dataKey="income"
         stackId="1"
         stroke="var(--color-income)"
-        fill="var(--color-income)"
-        fillOpacity={0.4}
         strokeWidth={2}
+        fill="url(#colorIncome)"
        />
        <Area
         type="monotone"
         dataKey="expenses"
-        stackId="2"
+        stackId="1"
         stroke="var(--color-expenses)"
-        fill="var(--color-expenses)"
-        fillOpacity={0.4}
         strokeWidth={2}
+        fill="url(#colorExpenses)"
        />
       </AreaChart>
      </ResponsiveContainer>
