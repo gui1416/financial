@@ -41,7 +41,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
      isMobile ? "ml-0" : sidebarCollapsed ? "ml-16" : "ml-64",
     )}
    >
-    <div className="h-full p-4 md:p-6 pt-16 md:pt-6">{children}</div>
+    <div className="h-full">{children}</div>
    </main>
   </div>
  )
