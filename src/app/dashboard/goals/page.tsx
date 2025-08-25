@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header" // 1. Importe o DashboardHeader
+import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { GoalsOverview } from "@/components/goals/goals-overview"
 import { GoalsList } from "@/components/goals/goals-list"
 
@@ -19,7 +19,7 @@ export default async function GoalsPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader /> {/* 2. Adicione o DashboardHeader aqui */}
+      <DashboardHeader />
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="space-y-6">
           <div>
