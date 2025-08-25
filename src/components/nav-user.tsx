@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Settings, LogOut, ChevronsUpDown } from "lucide-react"
+import { Settings, LogOut, ChevronsUpDown, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 interface NavUserProps {
  isCollapsed?: boolean
@@ -33,6 +34,7 @@ interface Profile {
 
 export function NavUser({ isCollapsed = false }: NavUserProps) {
  const router = useRouter()
+ const { theme, setTheme } = useTheme()
  const [user, setUser] = useState<User | null>(null)
  const [profile, setProfile] = useState<Profile | null>(null)
 
@@ -79,7 +81,7 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
       </Avatar>
      </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent className="w-56" align="start" side="right" forceMount>
+    <DropdownMenuContent className="w-56" align="start" side="top" forceMount>
      <DropdownMenuLabel className="font-normal">
       <div className="flex flex-col space-y-1">
        <p className="text-sm font-medium leading-none">{displayName}</p>
@@ -91,6 +93,10 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
       <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
        <Settings className="mr-2 h-4 w-4" />
        <span>Configurações</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+       {theme === 'light' ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
+       <span>{theme === 'light' ? 'Tema Escuro' : 'Tema Claro'}</span>
       </DropdownMenuItem>
      </DropdownMenuGroup>
      <DropdownMenuSeparator />
@@ -126,7 +132,7 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
       <ChevronsUpDown className="ml-2 h-4 w-4 flex-shrink-0 opacity-50" />
      </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent className="w-56" align="start" side="right" forceMount>
+    <DropdownMenuContent className="w-56" align="start" side="top" forceMount>
      <DropdownMenuLabel className="font-normal">
       <div className="flex flex-col space-y-1">
        <p className="text-sm font-medium leading-none">{displayName}</p>
@@ -138,6 +144,10 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
       <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
        <Settings className="mr-2 h-4 w-4" />
        <span>Configurações</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+       {theme === 'light' ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
+       <span>{theme === 'light' ? 'Tema Escuro' : 'Tema Claro'}</span>
       </DropdownMenuItem>
      </DropdownMenuGroup>
      <DropdownMenuSeparator />

@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react"
 import { NavUser } from "@/components/nav-user"
+// O import do ThemeToggle foi removido daqui
 
 interface NavItemProps {
   name: string;
@@ -213,6 +214,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
       </nav>
 
+      {/* O rodapé foi simplificado */}
       <div className="border-t p-3">
         <NavUser isCollapsed={isCollapsed} />
       </div>
