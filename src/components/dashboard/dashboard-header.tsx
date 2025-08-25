@@ -12,7 +12,6 @@ export function DashboardHeader() {
 
  const handleTransactionSaved = () => {
   setIsDialogOpen(false)
-  // Refresh the page to update metrics
   window.location.reload()
  }
 

@@ -24,7 +24,7 @@ interface Transaction {
   categories: {
     id: string
     name: string
-    color: string
+    color: string;
   }[] | null;
 }
 
@@ -190,7 +190,7 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
             </div>
           ) : (
             <Table>
-              <TableHeader>
+              <TableHeader className="max-md:hidden">
                 <TableRow>
                   <TableHead>Título</TableHead>
                   <TableHead>Categoria</TableHead>
@@ -204,8 +204,9 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
                 {transactions.map((transaction) => {
                   const category = transaction.categories && transaction.categories.length > 0 ? transaction.categories[0] : null;
                   return (
-                    <TableRow key={transaction.id}>
-                      <TableCell>
+                    <TableRow key={transaction.id} className="max-md:block max-md:border-b max-md:mb-4">
+                      <TableCell className="max-md:block">
+                        <div className="font-medium md:hidden text-muted-foreground text-xs">Título</div>
                         <div>
                           <p className="font-medium">{transaction.title}</p>
                           {transaction.description && (
@@ -213,7 +214,8 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="max-md:block">
+                        <div className="font-medium md:hidden text-muted-foreground text-xs">Categoria</div>
                         {category ? (
                           <Badge
                             variant="secondary"
@@ -226,20 +228,26 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
                           <span className="text-muted-foreground">Sem categoria</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="max-md:block">
+                        <div className="font-medium md:hidden text-muted-foreground text-xs">Tipo</div>
                         <Badge variant={transaction.type === "income" ? "default" : "secondary"}>
                           {transaction.type === "income" ? "Receita" : "Despesa"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDate(transaction.date)}</TableCell>
-                      <TableCell
-                        className={`text-right font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"
-                          }`}
-                      >
-                        {transaction.type === "income" ? "+" : "-"}
-                        {formatCurrency(transaction.amount)}
+                      <TableCell className="max-md:block">
+                        <div className="font-medium md:hidden text-muted-foreground text-xs">Data</div>
+                        {formatDate(transaction.date)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        className="max-md:block max-md:text-left font-medium"
+                      >
+                        <div className="font-medium md:hidden text-muted-foreground text-xs">Valor</div>
+                        <span className={`${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}>
+                          {transaction.type === "income" ? "+ " : "- "}
+                          {formatCurrency(transaction.amount)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="max-md:absolute max-md:top-2 max-md:right-2">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">

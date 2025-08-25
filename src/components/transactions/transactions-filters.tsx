@@ -62,19 +62,19 @@ export function TransactionsFilters() {
  return (
   <Card>
    <CardContent className="pt-6">
-    <div className="flex flex-col gap-4 md:flex-row md:items-center">
-     <div className="relative flex-1">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+     <div className="relative lg:col-span-1">
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
        placeholder="Buscar transações..."
        value={filters.search}
        onChange={(e) => handleFilterChange("search", e.target.value)}
-       className="pl-10"
+       className="pl-10 w-full"
       />
      </div>
-     <div className="flex gap-2">
+     <div className="grid grid-cols-2 gap-4">
       <Select value={filters.type} onValueChange={(value) => handleFilterChange("type", value)}>
-       <SelectTrigger className="w-[140px]">
+       <SelectTrigger>
         <SelectValue placeholder="Tipo" />
        </SelectTrigger>
        <SelectContent>
@@ -84,7 +84,7 @@ export function TransactionsFilters() {
        </SelectContent>
       </Select>
       <Select value={filters.categoryId} onValueChange={(value) => handleFilterChange("categoryId", value)}>
-       <SelectTrigger className="w-[160px]">
+       <SelectTrigger>
         <SelectValue placeholder="Categoria" />
        </SelectTrigger>
        <SelectContent>
@@ -100,24 +100,22 @@ export function TransactionsFilters() {
        </SelectContent>
       </Select>
      </div>
-     <div className="flex gap-2">
+     <div className="grid grid-cols-2 gap-4">
       <Input
        type="date"
        value={filters.dateFrom}
        onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
-       className="w-[140px]"
       />
       <Input
        type="date"
        value={filters.dateTo}
        onChange={(e) => handleFilterChange("dateTo", e.target.value)}
-       className="w-[140px]"
       />
      </div>
      {hasActiveFilters && (
       <Button variant="outline" size="sm" onClick={clearFilters} className="gap-2 bg-transparent">
        <X className="h-4 w-4" />
-       Limpar
+       Limpar Filtros
       </Button>
      )}
     </div>

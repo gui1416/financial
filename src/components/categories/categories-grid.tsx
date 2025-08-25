@@ -41,7 +41,6 @@ export function CategoriesGrid() {
    return;
   };
 
-  // Chamar a função RPC para obter categorias com contagem de transações
   const { data, error } = await supabase.rpc('get_categories_with_transaction_count');
 
   if (error) {
@@ -152,7 +151,7 @@ export function CategoriesGrid() {
  return (
   <>
    <div className="space-y-6">
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
      <div>
       <h3 className="text-lg font-medium">Categorias de Receita</h3>
       <p className="text-sm text-muted-foreground">Gerencie suas categorias de receita</p>
@@ -162,7 +161,7 @@ export function CategoriesGrid() {
        setSelectedCategory({ type: "income" } as Category)
        setIsDialogOpen(true)
       }}
-      className="gap-2"
+      className="gap-2 w-full md:w-auto"
      >
       <Plus className="h-4 w-4" />
       Nova Receita
@@ -193,7 +192,7 @@ export function CategoriesGrid() {
      </div>
     )}
 
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
      <div>
       <h3 className="text-lg font-medium">Categorias de Despesa</h3>
       <p className="text-sm text-muted-foreground">Gerencie suas categorias de despesa</p>
@@ -204,7 +203,7 @@ export function CategoriesGrid() {
        setIsDialogOpen(true)
       }}
       variant="outline"
-      className="gap-2"
+      className="gap-2 w-full md:w-auto"
      >
       <Plus className="h-4 w-4" />
       Nova Despesa
