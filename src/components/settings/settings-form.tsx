@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client" // Importação correta
 import { Loader2, User, Shield, Trash2 } from "lucide-react"
 import {
  AlertDialog,
@@ -35,7 +35,9 @@ export function SettingsForm({ profile }: SettingsFormProps) {
  const [loading, setLoading] = useState(false)
  const [deleteLoading, setDeleteLoading] = useState(false)
  const [fullName, setFullName] = useState(profile?.full_name || "")
- const supabase = createBrowserClient()
+
+ // CORREÇÃO APLICADA AQUI: Usando a função auxiliar que já tem as chaves.
+ const supabase = createClient()
 
  const handleUpdateProfile = async (e: React.FormEvent) => {
   e.preventDefault()

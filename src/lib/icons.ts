@@ -27,6 +27,15 @@ import {
  Dumbbell,
  Stethoscope,
  GraduationCap,
+ // Adicionados para a Sidebar
+ LayoutDashboard,
+ CreditCard,
+ Tags,
+ BarChart3,
+ Settings,
+ Target,
+ HelpCircle,
+ Wallet,
  type LucideIcon,
 } from "lucide-react"
 
@@ -59,6 +68,15 @@ export const iconMap: Record<string, LucideIcon> = {
  dumbbell: Dumbbell,
  stethoscope: Stethoscope,
  "graduation-cap": GraduationCap,
+ // Adicionados para a Sidebar
+ "layout-dashboard": LayoutDashboard,
+ "credit-card": CreditCard,
+ tags: Tags,
+ "bar-chart-3": BarChart3,
+ settings: Settings,
+ target: Target,
+ "help-circle": HelpCircle,
+ wallet: Wallet,
 }
 
 export const availableIcons = Object.keys(iconMap)

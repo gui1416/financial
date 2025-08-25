@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
-import { useQuery } from "@tanstack/react-query" // Importando o useQuery
-
+import { useQuery } from "@tanstack/react-query"
 interface Transaction {
   id: string
   title: string
