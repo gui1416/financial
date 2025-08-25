@@ -17,8 +17,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Calendar as CalendarIcon } from "lucide-react"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { cn } from "@/lib/utils"
 
 interface Goal {
  id?: string
@@ -49,7 +55,7 @@ export function GoalDialog({ open, onOpenChange, goal }: GoalDialogProps) {
   title: "",
   description: "",
   target: "",
-  deadline: "",
+  deadline: new Date(),
   type: "savings" as "savings" | "expense",
   category_id: "",
  })
@@ -74,7 +80,7 @@ export function GoalDialog({ open, onOpenChange, goal }: GoalDialogProps) {
     title: goal.title || "",
     description: goal.description || "",
     target: goal.target?.toString() || "",
-    deadline: goal.deadline || new Date().toISOString().split("T")[0],
+    deadline: goal.deadline ? new Date(goal.deadline) : new Date(),
     type: goal.type || "savings",
     category_id: goal.category_id || "",
    })
@@ -110,7 +116,7 @@ export function GoalDialog({ open, onOpenChange, goal }: GoalDialogProps) {
    title: formData.title,
    description: formData.description,
    target: parseFloat(formData.target),
-   deadline: formData.deadline,
+   deadline: format(formData.deadline, "yyyy-MM-dd"),
    type: formData.type,
    category_id: formData.category_id || null
   })
@@ -183,13 +189,29 @@ export function GoalDialog({ open, onOpenChange, goal }: GoalDialogProps) {
      <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
        <Label htmlFor="deadline">Prazo</Label>
-       <Input
-        id="deadline"
-        type="date"
-        value={formData.deadline}
-        onChange={(e) => setFormData((prev) => ({ ...prev, deadline: e.target.value }))}
-        required
-       />
+       <Popover>
+        <PopoverTrigger asChild>
+         <Button
+          variant={"outline"}
+          className={cn(
+           "w-full justify-start text-left font-normal",
+           !formData.deadline && "text-muted-foreground"
+          )}
+         >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {formData.deadline ? format(formData.deadline, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+         </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+         <Calendar
+          mode="single"
+          selected={formData.deadline}
+          onSelect={(date) => date && setFormData({ ...formData, deadline: date })}
+          initialFocus
+          locale={ptBR}
+         />
+        </PopoverContent>
+       </Popover>
       </div>
 
       <div className="space-y-2">

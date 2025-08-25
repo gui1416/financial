@@ -3,10 +3,9 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { useState, useEffect, ElementType } from "react"
+import { useEffect, ElementType } from "react"
 import {
   LayoutDashboard,
   CreditCard,
@@ -17,11 +16,9 @@ import {
   Target,
   HelpCircle,
   ChevronRight,
-  Menu,
-  X,
 } from "lucide-react"
 import { NavUser } from "@/components/nav-user"
-// O import do ThemeToggle foi removido daqui
+import { useSidebar } from "./dashboard-shell"
 
 interface NavItemProps {
   name: string;
@@ -30,50 +27,20 @@ interface NavItemProps {
   badge?: string;
 }
 
-
 const mainNavigation: NavItemProps[] = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Transações",
-    href: "/dashboard/transactions",
-    icon: CreditCard,
-    badge: "Novo",
-  },
-  {
-    name: "Categorias",
-    href: "/dashboard/categories",
-    icon: Tags,
-  },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Transações", href: "/dashboard/transactions", icon: CreditCard, badge: "Novo" },
+  { name: "Categorias", href: "/dashboard/categories", icon: Tags },
 ]
 
 const analyticsNavigation: NavItemProps[] = [
-  {
-    name: "Metas",
-    href: "/dashboard/goals",
-    icon: Target,
-  },
-  {
-    name: "Relatórios",
-    href: "/dashboard/analytics",
-    icon: BarChart3,
-  },
+  { name: "Metas", href: "/dashboard/goals", icon: Target },
+  { name: "Relatórios", href: "/dashboard/analytics", icon: BarChart3 },
 ]
 
 const supportNavigation: NavItemProps[] = [
-  {
-    name: "Ajuda",
-    href: "/dashboard/help",
-    icon: HelpCircle,
-  },
-  {
-    name: "Configurações",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
+  { name: "Ajuda", href: "/dashboard/help", icon: HelpCircle },
+  { name: "Configurações", href: "/dashboard/settings", icon: Settings },
 ]
 
 interface SidebarProps {
@@ -82,29 +49,7 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false)
-      }
-    }
-
-    checkScreenSize()
-    window.addEventListener("resize", checkScreenSize)
-    return () => window.removeEventListener("resize", checkScreenSize)
-  }, [])
-
-  useEffect(() => {
-    const event = new CustomEvent("sidebar-toggle", {
-      detail: { isCollapsed },
-    })
-    window.dispatchEvent(event)
-  }, [isCollapsed])
+  const { isCollapsed, isMobileMenuOpen, setIsMobileMenuOpen, isMobile } = useSidebar();
 
   const NavItem = ({ item, isActive }: { item: NavItemProps; isActive: boolean }) => (
     <Link
@@ -149,28 +94,6 @@ export function Sidebar({ className }: SidebarProps) {
     )
   }
 
-  const MobileToggle = () => (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="md:hidden fixed top-4 left-4 z-50 h-9 w-9 p-0"
-      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-    >
-      {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-    </Button>
-  )
-
-  const DesktopToggle = () => (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="hidden md:flex absolute -right-3 top-6 h-6 w-6 rounded-full border bg-background p-0 shadow-md z-10"
-      onClick={() => setIsCollapsed(!isCollapsed)}
-    >
-      <ChevronRight className={cn("h-3 w-3 transition-transform", isCollapsed ? "rotate-0" : "rotate-180")} />
-    </Button>
-  )
-
   const sidebarContent = (
     <>
       <div className={cn("flex h-16 items-center border-b", isCollapsed ? "px-3 justify-center" : "px-6")}>
@@ -198,14 +121,12 @@ export function Sidebar({ className }: SidebarProps) {
             <NavItem key={item.name} item={item} isActive={pathname === item.href} />
           ))}
         </div>
-
         <SectionHeader title="Análises" />
         <div className="space-y-0.5">
           {analyticsNavigation.map((item) => (
             <NavItem key={item.name} item={item} isActive={pathname === item.href} />
           ))}
         </div>
-
         <SectionHeader title="Suporte" />
         <div className="space-y-0.5">
           {supportNavigation.map((item) => (
@@ -214,7 +135,6 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
       </nav>
 
-      {/* O rodapé foi simplificado */}
       <div className="border-t p-3">
         <NavUser isCollapsed={isCollapsed} />
       </div>
@@ -223,23 +143,32 @@ export function Sidebar({ className }: SidebarProps) {
 
   return (
     <>
-      <MobileToggle />
+      {/* Overlay para o fundo escuro quando o menu móvel estiver aberto */}
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
+
+      {/* Container da Sidebar com a lógica de animação */}
       <div
         className={cn(
-          "fixed left-0 top-0 z-30 flex h-screen flex-col border-r bg-card transition-all duration-300 ease-in-out",
-          "hidden md:flex",
-          isCollapsed ? "w-16" : "w-64",
-          isMobile && isMobileMenuOpen && "flex w-64 z-50",
-          className,
+          "fixed left-0 top-0 z-50 flex h-screen flex-col border-r bg-card transition-all duration-300 ease-in-out",
+          // Estilos e transições para DESKTOP
+          "md:relative md:z-30",
+          isCollapsed ? "md:w-16" : "md:w-64",
+
+          // Estilos e transições para MOBILE
+          isMobile
+            ? isMobileMenuOpen
+              ? "w-64 translate-x-0" // Aberto (visível na tela)
+              : "w-64 -translate-x-full" // Fechado (escondido à esquerda)
+            : "",
+
+          className
         )}
       >
-        <DesktopToggle />
         {sidebarContent}
       </div>
     </>

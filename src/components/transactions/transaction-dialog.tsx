@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import {
@@ -18,7 +17,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Calendar as CalendarIcon } from "lucide-react"
 import { toast } from "sonner"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { cn } from "@/lib/utils"
 
 interface Category {
  id: string
@@ -57,7 +62,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
   amount: "",
   type: "expense" as "income" | "expense",
   categoryId: "",
-  date: new Date().toISOString().split("T")[0],
+  date: new Date(),
  })
 
  useEffect(() => {
@@ -69,7 +74,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
     amount: transaction.amount.toString(),
     type: transaction.type,
     categoryId: category?.id || "",
-    date: transaction.date,
+    date: new Date(transaction.date),
    })
   } else {
    setFormData({
@@ -78,7 +83,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
     amount: "",
     type: "expense",
     categoryId: "",
-    date: new Date().toISOString().split("T")[0],
+    date: new Date(),
    })
   }
  }, [transaction, open])
@@ -127,7 +132,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
    amount: Number.parseFloat(formData.amount),
    type: formData.type,
    category_id: formData.categoryId || null,
-   date: formData.date,
+   date: format(formData.date, "yyyy-MM-dd"),
    user_id: user.id,
   }
 
@@ -245,13 +250,29 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
       </div>
       <div className="grid gap-2">
        <Label htmlFor="date">Data</Label>
-       <Input
-        id="date"
-        type="date"
-        value={formData.date}
-        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-        required
-       />
+       <Popover>
+        <PopoverTrigger asChild>
+         <Button
+          variant={"outline"}
+          className={cn(
+           "w-full justify-start text-left font-normal",
+           !formData.date && "text-muted-foreground"
+          )}
+         >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {formData.date ? format(formData.date, "PPP", { locale: ptBR }) : <span>Escolha uma data</span>}
+         </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+         <Calendar
+          mode="single"
+          selected={formData.date}
+          onSelect={(date) => date && setFormData({ ...formData, date })}
+          initialFocus
+          locale={ptBR}
+         />
+        </PopoverContent>
+       </Popover>
       </div>
      </div>
      <DialogFooter>

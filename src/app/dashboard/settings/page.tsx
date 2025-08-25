@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 export default async function SettingsPage() {
  const supabase = await createClient();
@@ -19,6 +20,7 @@ export default async function SettingsPage() {
 
  return (
   <DashboardShell>
+   <DashboardHeader />
    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
     <div className="space-y-6">
      <div>
