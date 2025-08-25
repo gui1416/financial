@@ -13,7 +13,7 @@ interface Transaction {
   categories: {
     name: string
     color: string
-  } | null
+  }[] | null
 }
 
 const fetchRecentTransactions = async (): Promise<Transaction[]> => {
@@ -102,33 +102,36 @@ export function RecentTransactions() {
           {transactions.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">Nenhuma transação encontrada</p>
           ) : (
-            transactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center space-x-4">
-                <div
-                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                  style={{ backgroundColor: transaction.categories?.color || "#6b7280" }}
-                >
-                  {transaction.categories?.name.charAt(0).toUpperCase() || "T"}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium leading-none">{transaction.title}</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs text-muted-foreground">{formatDate(transaction.date)}</p>
-                    {transaction.categories && (
-                      <Badge variant="secondary" className="text-xs">
-                        {transaction.categories.name}
-                      </Badge>
-                    )}
+            transactions.map((transaction) => {
+              const category = transaction.categories && transaction.categories.length > 0 ? transaction.categories[0] : null;
+              return (
+                <div key={transaction.id} className="flex items-center space-x-4">
+                  <div
+                    className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                    style={{ backgroundColor: category?.color || "#6b7280" }}
+                  >
+                    {category?.name.charAt(0).toUpperCase() || "T"}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">{transaction.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-muted-foreground">{formatDate(transaction.date)}</p>
+                      {category && (
+                        <Badge variant="secondary" className="text-xs">
+                          {category.name}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className={`text-sm font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {transaction.type === "income" ? "+" : "-"}
+                    {formatCurrency(transaction.amount)}
                   </div>
                 </div>
-                <div
-                  className={`text-sm font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}
-                >
-                  {transaction.type === "income" ? "+" : "-"}
-                  {formatCurrency(transaction.amount)}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </CardContent>
