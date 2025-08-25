@@ -83,7 +83,7 @@ export function TransactionsChart() {
 
  if (isLoading) {
   return (
-   <Card className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+   <Card>
     <CardHeader>
      <CardTitle>Fluxo de Caixa</CardTitle>
      <CardDescription>Receitas e gastos no período</CardDescription>
@@ -96,27 +96,29 @@ export function TransactionsChart() {
  }
 
  return (
-  <Card className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  <Card>
    <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
     <div>
      <CardTitle>Fluxo de Caixa</CardTitle>
      <CardDescription>Receitas e gastos no período selecionado</CardDescription>
     </div>
     <Select value={String(period)} onValueChange={(value) => setPeriod(Number(value))}>
-     <SelectTrigger className="w-[180px]">
-      <SelectValue placeholder="Selecione o período" />
+     {/* CORREÇÃO: Largura do botão ajustada e placeholder removido */}
+     <SelectTrigger className="w-auto">
+      <SelectValue />
      </SelectTrigger>
      <SelectContent>
-      <SelectItem value="7">Últimos 7 dias</SelectItem>
-      <SelectItem value="30">Últimos 30 dias</SelectItem>
-      <SelectItem value="90">Últimos 90 dias</SelectItem>
+      {/* CORREÇÃO: Texto dos itens do menu agora é responsivo */}
+      <SelectItem value="7">{isMobile ? "7 dias" : "Últimos 7 dias"}</SelectItem>
+      <SelectItem value="30">{isMobile ? "30 dias" : "Últimos 30 dias"}</SelectItem>
+      <SelectItem value="90">{isMobile ? "90 dias" : "Últimos 90 dias"}</SelectItem>
      </SelectContent>
     </Select>
    </CardHeader>
    <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
     <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
      <ResponsiveContainer>
-      <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: isMobile ? 30 : 10 }}>
+      <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: isMobile ? 30 : 10 }}>
        <defs>
         <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
          <stop offset="5%" stopColor="var(--color-income)" stopOpacity={0.8} />
@@ -142,7 +144,12 @@ export function TransactionsChart() {
         tickLine={false}
         axisLine={false}
         tickMargin={8}
-        tickFormatter={(value) => `$${value / 1000}k`}
+        tickFormatter={(value) =>
+         new Intl.NumberFormat("pt-BR", {
+          notation: "compact",
+          compactDisplay: "short",
+         }).format(value as number)
+        }
        />
        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
        <Area
