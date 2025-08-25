@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,9 +33,11 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ profile }: SettingsFormProps) {
+ const router = useRouter()
  const [loading, setLoading] = useState(false)
  const [deleteLoading, setDeleteLoading] = useState(false)
  const [fullName, setFullName] = useState(profile?.full_name || "")
+ const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "")
 
  const supabase = createClient()
 
@@ -43,14 +46,18 @@ export function SettingsForm({ profile }: SettingsFormProps) {
   setLoading(true)
 
   try {
-   const { error } = await supabase.from("profiles").update({ full_name: fullName }).eq("id", profile?.id)
+   const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: fullName, avatar_url: avatarUrl })
+    .eq("id", profile?.id)
 
    if (error) throw error
 
    toast.success("Perfil atualizado", {
     description: "Suas informações foram salvas com sucesso.",
    })
-  } catch {
+   router.refresh()
+  } catch (error) {
    toast.error("Erro ao atualizar", {
     description: "Não foi possível salvar as alterações.",
    })
@@ -116,6 +123,17 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
         placeholder="Digite seu nome completo"
+       />
+      </div>
+
+      <div className="space-y-2">
+       <Label htmlFor="avatarUrl">URL da Foto de Perfil</Label>
+       <Input
+        id="avatarUrl"
+        type="url"
+        value={avatarUrl}
+        onChange={(e) => setAvatarUrl(e.target.value)}
+        placeholder="https://github.com/gui1416.png"
        />
       </div>
 

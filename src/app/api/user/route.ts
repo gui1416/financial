@@ -1,12 +1,10 @@
-// src/app/api/user/route.ts
-
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function DELETE() {
- const cookieStore = cookies();
+ const cookieStore = await cookies();
 
  // 1. Criar um cliente Supabase para obter o usuário da sessão atual
  const supabase = createServerClient(

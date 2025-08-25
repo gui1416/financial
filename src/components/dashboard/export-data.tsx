@@ -1,3 +1,7 @@
+// 
+// Path: src/components/dashboard/export-data.tsx
+// 
+
 "use client"
 
 import { useState } from "react"
@@ -33,10 +37,10 @@ interface Transaction {
   created_at: string;
   categories: {
     name: string;
-    type: string;
+    type: "income" | "expense";
     color: string;
     icon: string;
-  }[] | null;
+  }[]; // CORREÇÃO 1: Alterado para ser um array
 }
 
 interface Category {
@@ -77,6 +81,7 @@ export function ExportData() {
 
       const exportData: ExportData = {}
 
+      // Exportar transações
       if (includeTransactions) {
         let query = supabase
           .from("transactions")
@@ -108,6 +113,7 @@ export function ExportData() {
         exportData.transactions = transactions
       }
 
+      // Exportar categorias
       if (includeCategories) {
         const { data: categories, error: categoriesError } = await supabase
           .from("categories")
@@ -119,6 +125,7 @@ export function ExportData() {
         exportData.categories = categories
       }
 
+      // Gerar arquivo
       if (format === "json") {
         downloadJSON(exportData)
       } else {
@@ -130,7 +137,7 @@ export function ExportData() {
       })
 
       setOpen(false)
-    } catch (error) {
+    } catch {
       toast.error("Erro na exportação", {
         description: "Não foi possível exportar os dados. Tente novamente.",
       })
@@ -174,10 +181,11 @@ export function ExportData() {
       t.description || "",
       t.amount,
       t.type === "income" ? "Receita" : "Despesa",
-      t.categories?.[0]?.name || "Sem categoria",
+      // CORREÇÃO 2: Acessa o nome da categoria no primeiro item do array
+      t.categories && t.categories.length > 0 ? t.categories[0].name : "Sem categoria",
     ])
 
-    return [headers, ...rows].map((row) => row.map((field) => `"${field}"`).join(",")).join("\n")
+    return [headers, ...rows].map((row) => row.map((field) => `"${String(field)}"`).join(",")).join("\n")
   }
 
   return (
