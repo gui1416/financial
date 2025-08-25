@@ -18,9 +18,7 @@ interface Category {
  icon: string
  type: "income" | "expense"
  created_at: string
- _count?: {
-  transactions: number
- }
+ transactions_count?: number
 }
 
 export function CategoriesGrid() {
@@ -32,37 +30,24 @@ export function CategoriesGrid() {
  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
 
  const fetchCategories = async () => {
+  setIsLoading(true);
   const supabase = createClient()
   const {
    data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return
+  if (!user) {
+   setIsLoading(false);
+   return;
+  };
 
-  const { data } = await supabase
-   .from("categories")
-   .select("id, name, color, icon, type, created_at")
-   .eq("user_id", user.id)
-   .order("type", { ascending: true })
-   .order("name", { ascending: true })
+  // Chamar a função RPC para obter categorias com contagem de transações
+  const { data, error } = await supabase.rpc('get_categories_with_transaction_count');
 
-  if (data) {
-   // Get transaction counts for each category
-   const categoriesWithCounts = await Promise.all(
-    data.map(async (category) => {
-     const { count } = await supabase
-      .from("transactions")
-      .select("*", { count: "exact", head: true })
-      .eq("category_id", category.id)
-
-     return {
-      ...category,
-      _count: { transactions: count || 0 },
-     }
-    }),
-   )
-
-   setCategories(categoriesWithCounts)
+  if (error) {
+   console.error("Error fetching categories with counts:", error);
+  } else if (data) {
+   setCategories(data);
   }
 
   setIsLoading(false)
@@ -133,7 +118,7 @@ export function CategoriesGrid() {
        </div>
        <div>
         <h3 className="font-medium">{category.name}</h3>
-        <p className="text-sm text-muted-foreground">{category._count?.transactions || 0} transações</p>
+        <p className="text-sm text-muted-foreground">{category.transactions_count || 0} transações</p>
        </div>
       </div>
       <DropdownMenu>

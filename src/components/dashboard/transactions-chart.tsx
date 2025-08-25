@@ -3,8 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { useQuery } from "@tanstack/react-query"
 
 interface ChartData {
  date: string
@@ -23,64 +23,52 @@ const chartConfig = {
  },
 }
 
-export function TransactionsChart() {
- const [data, setData] = useState<ChartData[]>([])
- const [isLoading, setIsLoading] = useState(true)
+const fetchChartData = async (): Promise<ChartData[]> => {
+ const supabase = createClient();
+ const { data: { user } } = await supabase.auth.getUser();
 
- useEffect(() => {
-  async function fetchChartData() {
-   const supabase = createClient()
-   const {
-    data: { user },
-   } = await supabase.auth.getUser()
+ if (!user) throw new Error("Usuário não autenticado");
 
-   if (!user) return
+ const endDate = new Date();
+ const startDate = new Date();
+ startDate.setDate(startDate.getDate() - 30);
 
-   // Get last 30 days
-   const endDate = new Date()
-   const startDate = new Date()
-   startDate.setDate(startDate.getDate() - 30)
+ const { data: transactions, error } = await supabase
+  .from("transactions")
+  .select("amount, type, date")
+  .eq("user_id", user.id)
+  .gte("date", startDate.toISOString().split("T")[0])
+  .lte("date", endDate.toISOString().split("T")[0])
+  .order("date", { ascending: true });
 
-   const { data: transactions } = await supabase
-    .from("transactions")
-    .select("amount, type, date")
-    .eq("user_id", user.id)
-    .gte("date", startDate.toISOString().split("T")[0])
-    .lte("date", endDate.toISOString().split("T")[0])
-    .order("date", { ascending: true })
+ if (error) throw error;
 
-   if (transactions) {
-    // Group by date
-    const groupedData: { [key: string]: { income: number; expenses: number } } = {}
+ const groupedData: { [key: string]: { income: number; expenses: number } } = {};
 
-    transactions.forEach((transaction) => {
-     const date = transaction.date
-     if (!groupedData[date]) {
-      groupedData[date] = { income: 0, expenses: 0 }
-     }
-
-     if (transaction.type === "income") {
-      groupedData[date].income += Number(transaction.amount)
-     } else {
-      groupedData[date].expenses += Number(transaction.amount)
-     }
-    })
-
-    // Convert to chart format
-    const chartData = Object.entries(groupedData).map(([date, values]) => ({
-     date: new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-     income: values.income,
-     expenses: values.expenses,
-    }))
-
-    setData(chartData)
-   }
-
-   setIsLoading(false)
+ transactions.forEach((transaction) => {
+  const date = transaction.date;
+  if (!groupedData[date]) {
+   groupedData[date] = { income: 0, expenses: 0 };
   }
+  if (transaction.type === "income") {
+   groupedData[date].income += Number(transaction.amount);
+  } else {
+   groupedData[date].expenses += Number(transaction.amount);
+  }
+ });
 
-  fetchChartData()
- }, [])
+ return Object.entries(groupedData).map(([date, values]) => ({
+  date: new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+  income: values.income,
+  expenses: values.expenses,
+ }));
+}
+
+export function TransactionsChart() {
+ const { data = [], isLoading } = useQuery({
+  queryKey: ['transactionsChartData'],
+  queryFn: fetchChartData
+ });
 
  if (isLoading) {
   return (
