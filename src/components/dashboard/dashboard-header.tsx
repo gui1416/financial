@@ -5,7 +5,7 @@ import { Plus, PanelLeft } from "lucide-react"
 import { useState } from "react"
 import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 import { ExportData } from "@/components/dashboard/export-data"
-import { useSidebar } from "./dashboard-shell"
+import { useSidebar } from "@/app/dashboard/layout"
 
 export function DashboardHeader() {
  const [isDialogOpen, setIsDialogOpen] = useState(false)

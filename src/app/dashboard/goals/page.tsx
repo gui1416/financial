@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { GoalsOverview } from "@/components/goals/goals-overview"
 import { GoalsList } from "@/components/goals/goals-list"
@@ -18,7 +17,7 @@ export default async function GoalsPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <DashboardHeader />
       <div className="space-y-6">
         <div>
@@ -28,6 +27,6 @@ export default async function GoalsPage() {
         <GoalsOverview />
         <GoalsList />
       </div>
-    </DashboardShell>
+    </>
   )
 }

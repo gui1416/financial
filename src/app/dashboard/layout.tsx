@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-import { Sidebar } from "./sidebar"
 import { useState, useEffect, createContext, useContext } from "react"
+import { Sidebar } from "@/components/dashboard/sidebar"
 import { cn } from "@/lib/utils"
 
 interface SidebarContextType {
@@ -23,11 +23,7 @@ export function useSidebar() {
  return context;
 }
 
-interface DashboardShellProps {
- children: React.ReactNode
-}
-
-export function DashboardShell({ children }: DashboardShellProps) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
  const [isCollapsed, setIsCollapsed] = useState(false);
  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [isMobile, setIsMobile] = useState(false);
@@ -52,7 +48,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
     <Sidebar />
     <main
      className={cn(
-      "flex-1 overflow-y-auto transition-all duration-300 ease-in-out"
+      "flex-1 overflow-y-auto transition-all duration-300 ease-in-out",
+      isCollapsed ? "md:ml-16" : "md:ml-64"
      )}
     >
      <div className="p-4 md:p-8">{children}</div>

@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow"
 
 export default async function OnboardingPage() {
@@ -21,9 +20,5 @@ export default async function OnboardingPage() {
   redirect("/dashboard")
  }
 
- return (
-  <DashboardShell>
-   <OnboardingFlow />
-  </DashboardShell>
- )
+ return <OnboardingFlow />
 }

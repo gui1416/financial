@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { TransactionsTable } from "@/components/transactions/transactions-table"
 import { TransactionsFilters } from "@/components/transactions/transactions-filters"
@@ -17,7 +16,7 @@ export default async function TransactionsPage() {
  }
 
  return (
-  <DashboardShell>
+  <>
    <DashboardHeader />
    <div className="flex items-center justify-between space-y-2">
     <h2 className="text-3xl font-bold tracking-tight">Transações</h2>
@@ -26,6 +25,6 @@ export default async function TransactionsPage() {
     <TransactionsFilters />
     <TransactionsTable />
    </div>
-  </DashboardShell>
+  </>
  )
 }

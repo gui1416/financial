@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { CategoriesGrid } from "@/components/categories/categories-grid"
 
@@ -16,7 +15,7 @@ export default async function CategoriesPage() {
  }
 
  return (
-  <DashboardShell>
+  <>
    <DashboardHeader />
    <div className="flex items-center justify-between space-y-2">
     <h2 className="text-3xl font-bold tracking-tight">Categorias</h2>
@@ -24,6 +23,6 @@ export default async function CategoriesPage() {
    <div className="space-y-4">
     <CategoriesGrid />
    </div>
-  </DashboardShell>
+  </>
  )
 }

@@ -18,7 +18,7 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { NavUser } from "@/components/nav-user"
-import { useSidebar } from "./dashboard-shell"
+import { useSidebar } from "@/app/dashboard/layout"
 
 interface NavItemProps {
   name: string;
@@ -143,7 +143,6 @@ export function Sidebar({ className }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay para o fundo escuro quando o menu móvel estiver aberto */}
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
@@ -151,19 +150,15 @@ export function Sidebar({ className }: SidebarProps) {
         />
       )}
 
-      {/* Container da Sidebar com a lógica de animação */}
       <div
         className={cn(
           "fixed left-0 top-0 z-50 flex h-screen flex-col border-r bg-card transition-all duration-300 ease-in-out",
-          // Estilos e transições para DESKTOP
-          "md:relative md:z-30",
           isCollapsed ? "md:w-16" : "md:w-64",
 
-          // Estilos e transições para MOBILE
           isMobile
             ? isMobileMenuOpen
-              ? "w-64 translate-x-0" // Aberto (visível na tela)
-              : "w-64 -translate-x-full" // Fechado (escondido à esquerda)
+              ? "w-64 translate-x-0"
+              : "w-64 -translate-x-full"
             : "",
 
           className

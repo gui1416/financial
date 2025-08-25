@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { AnalyticsFilters } from "@/components/analytics/analytics-filters"
 import { AnalyticsOverview } from "@/components/analytics/analytics-overview"
@@ -20,7 +19,7 @@ export default async function AnalyticsPage() {
  }
 
  return (
-  <DashboardShell>
+  <>
    <DashboardHeader />
    <div className="flex items-center justify-between space-y-2">
     <h2 className="text-3xl font-bold tracking-tight">Relatórios</h2>
@@ -34,6 +33,6 @@ export default async function AnalyticsPage() {
     </div>
     <TrendAnalysis />
    </div>
-  </DashboardShell>
+  </>
  )
 }

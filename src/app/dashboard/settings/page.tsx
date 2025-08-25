@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "@/components/settings/settings-form";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 export default async function SettingsPage() {
@@ -19,7 +18,7 @@ export default async function SettingsPage() {
  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
 
  return (
-  <DashboardShell>
+  <>
    <DashboardHeader />
    <div className="space-y-6">
     <div>
@@ -30,6 +29,6 @@ export default async function SettingsPage() {
     </div>
     <SettingsForm profile={profile} />
    </div>
-  </DashboardShell>
+  </>
  );
 }
