@@ -57,7 +57,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
     description: "Suas informações foram salvas com sucesso.",
    })
    router.refresh()
-  } catch (error) {
+  } catch {
    toast.error("Erro ao atualizar", {
     description: "Não foi possível salvar as alterações.",
    })
