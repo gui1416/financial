@@ -5,13 +5,12 @@ import { Sidebar } from "./sidebar"
 import { useState, useEffect, createContext, useContext } from "react"
 import { cn } from "@/lib/utils"
 
-// 1. Adicionamos 'isMobile' ao tipo do nosso contexto
 interface SidebarContextType {
  isCollapsed: boolean;
  setIsCollapsed: (value: boolean | ((prev: boolean) => boolean)) => void;
  isMobileMenuOpen: boolean;
  setIsMobileMenuOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
- isMobile: boolean; // Adicionado
+ isMobile: boolean;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -48,17 +47,15 @@ export function DashboardShell({ children }: DashboardShellProps) {
  }, [])
 
  return (
-  // 2. Passamos 'isMobile' para todos os componentes através do Provider
   <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed, isMobileMenuOpen, setIsMobileMenuOpen, isMobile }}>
    <div className="flex min-h-screen bg-background">
     <Sidebar />
     <main
      className={cn(
-      "flex-1 overflow-hidden transition-all duration-300 ease-in-out",
-      isMobile ? "ml-0" : isCollapsed ? "ml-16" : "ml-64",
+      "flex-1 overflow-y-auto transition-all duration-300 ease-in-out"
      )}
     >
-     <div className="h-full">{children}</div>
+     <div className="p-4 md:p-8">{children}</div>
     </main>
    </div>
   </SidebarContext.Provider>
