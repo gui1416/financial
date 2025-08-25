@@ -1,7 +1,5 @@
 "use client"
 
-import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import {
  AlertDialog,
  AlertDialogAction,
@@ -25,30 +23,10 @@ interface DeleteTransactionDialogProps {
  onOpenChange: (open: boolean) => void
  transaction: Transaction | null
  onDeleted: () => void
+ isLoading?: boolean;
 }
 
-export function DeleteTransactionDialog({ open, onOpenChange, transaction, onDeleted }: DeleteTransactionDialogProps) {
- const [isLoading, setIsLoading] = useState(false)
-
- const handleDelete = async () => {
-  if (!transaction) return
-
-  setIsLoading(true)
-
-  const supabase = createClient()
-
-  try {
-   const { error } = await supabase.from("transactions").delete().eq("id", transaction.id)
-
-   if (error) throw error
-
-   onDeleted()
-  } catch (error) {
-   console.error("Error deleting transaction:", error)
-  } finally {
-   setIsLoading(false)
-  }
- }
+export function DeleteTransactionDialog({ open, onOpenChange, transaction, onDeleted, isLoading = false }: DeleteTransactionDialogProps) {
 
  const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("pt-BR", {
@@ -70,7 +48,7 @@ export function DeleteTransactionDialog({ open, onOpenChange, transaction, onDel
     <AlertDialogFooter>
      <AlertDialogCancel>Cancelar</AlertDialogCancel>
      <AlertDialogAction
-      onClick={handleDelete}
+      onClick={onDeleted}
       disabled={isLoading}
       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
      >

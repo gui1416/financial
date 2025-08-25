@@ -25,7 +25,7 @@ interface Transaction {
     id: string
     name: string
     color: string
-  } | null
+  }[] | null;
 }
 
 interface TransactionsTableProps {
@@ -38,8 +38,6 @@ interface TransactionsTableProps {
   }
 }
 
-
-// Função de busca movida para fora para ser usada pelo useQuery
 const fetchTransactions = async (filters: TransactionsTableProps['filters']) => {
   const supabase = createClient()
   const {
@@ -69,7 +67,6 @@ const fetchTransactions = async (filters: TransactionsTableProps['filters']) => 
     .eq("user_id", user.id)
     .order("date", { ascending: false })
 
-  // Apply filters
   if (filters?.search) {
     query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
   }
@@ -101,7 +98,6 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null)
 
-  // Usando useQuery para buscar e gerenciar os dados
   const { data: transactions = [], isLoading } = useQuery({
     queryKey: ['transactions', filters],
     queryFn: () => fetchTransactions(filters),
@@ -115,9 +111,7 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
     },
     onSuccess: () => {
       toast.success("Transação excluída com sucesso!");
-      // Invalida o cache para forçar a busca de novos dados
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      // Também invalida queries de métricas e gráficos para que eles atualizem
       queryClient.invalidateQueries({ queryKey: ['metrics'] });
       queryClient.invalidateQueries({ queryKey: ['chartData'] });
       setIsDeleteDialogOpen(false);
@@ -155,7 +149,6 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
   const handleTransactionSaved = () => {
     setIsDialogOpen(false)
     setSelectedTransaction(null)
-    // Apenas invalida a query, não recarrega a página
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
     queryClient.invalidateQueries({ queryKey: ['metrics'] });
     queryClient.invalidateQueries({ queryKey: ['chartData'] });
@@ -166,10 +159,6 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
       deleteMutation.mutate(transactionToDelete.id);
     }
   }
-
-  // ... (resto do componente, renderização da tabela, etc.)
-  // O JSX permanece praticamente o mesmo, mas agora `transactions` e `isLoading`
-  // vêm diretamente do `useQuery`.
 
   return (
     <>
@@ -212,63 +201,66 @@ export function TransactionsTable({ filters }: TransactionsTableProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{transaction.title}</p>
-                        {transaction.description && (
-                          <p className="text-sm text-muted-foreground">{transaction.description}</p>
+                {transactions.map((transaction) => {
+                  const category = transaction.categories && transaction.categories.length > 0 ? transaction.categories[0] : null;
+                  return (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{transaction.title}</p>
+                          {transaction.description && (
+                            <p className="text-sm text-muted-foreground">{transaction.description}</p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {category ? (
+                          <Badge
+                            variant="secondary"
+                            className="text-white"
+                            style={{ backgroundColor: category.color }}
+                          >
+                            {category.name}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Sem categoria</span>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {transaction.categories ? (
-                        <Badge
-                          variant="secondary"
-                          className="text-white"
-                          style={{ backgroundColor: transaction.categories.color }}
-                        >
-                          {transaction.categories.name}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={transaction.type === "income" ? "default" : "secondary"}>
+                          {transaction.type === "income" ? "Receita" : "Despesa"}
                         </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">Sem categoria</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={transaction.type === "income" ? "default" : "secondary"}>
-                        {transaction.type === "income" ? "Receita" : "Despesa"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatDate(transaction.date)}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"
-                        }`}
-                    >
-                      {transaction.type === "income" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(transaction)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDelete(transaction)} className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>{formatDate(transaction.date)}</TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${transaction.type === "income" ? "text-green-600" : "text-red-600"
+                          }`}
+                      >
+                        {transaction.type === "income" ? "+" : "-"}
+                        {formatCurrency(transaction.amount)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(transaction)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(transaction)} className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

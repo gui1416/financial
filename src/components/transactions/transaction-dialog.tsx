@@ -38,7 +38,7 @@ interface Transaction {
   id: string
   name: string
   color: string
- } | null
+ }[] | null
 }
 
 interface TransactionDialogProps {
@@ -62,12 +62,13 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
 
  useEffect(() => {
   if (transaction) {
+   const category = transaction.categories && transaction.categories.length > 0 ? transaction.categories[0] : null;
    setFormData({
     title: transaction.title,
     description: transaction.description || "",
     amount: transaction.amount.toString(),
     type: transaction.type,
-    categoryId: transaction.categories?.id || "",
+    categoryId: category?.id || "",
     date: transaction.date,
    })
   } else {
@@ -132,7 +133,6 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
 
   try {
    if (transaction) {
-    // Update existing transaction
     const { error } = await supabase.from("transactions").update(transactionData).eq("id", transaction.id)
 
     if (error) throw error
@@ -141,7 +141,6 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
      description: "A transação foi atualizada com sucesso.",
     })
    } else {
-    // Create new transaction
     const { error } = await supabase.from("transactions").insert(transactionData)
 
     if (error) throw error
