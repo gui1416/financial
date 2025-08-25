@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
 interface GoalDialogProps {
@@ -34,7 +34,6 @@ export function GoalDialog({ open, onOpenChange }: GoalDialogProps) {
   type: "savings" as "savings" | "expense",
   category: "",
  })
- const { toast } = useToast()
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -45,8 +44,7 @@ export function GoalDialog({ open, onOpenChange }: GoalDialogProps) {
    // Por enquanto, apenas simular o salvamento
    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-   toast({
-    title: "Meta criada",
+   toast.success("Meta criada", {
     description: "Sua nova meta foi criada com sucesso.",
    })
 
@@ -62,10 +60,8 @@ export function GoalDialog({ open, onOpenChange }: GoalDialogProps) {
 
    onOpenChange(false)
   } catch (error) {
-   toast({
-    title: "Erro ao criar meta",
+   toast.error("Erro ao criar meta", {
     description: "Não foi possível criar a meta. Tente novamente.",
-    variant: "destructive",
    })
   } finally {
    setLoading(false)

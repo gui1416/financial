@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { Loader2, User, Shield, Trash2 } from "lucide-react"
 import {
@@ -35,8 +35,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
  const [loading, setLoading] = useState(false)
  const [deleteLoading, setDeleteLoading] = useState(false)
  const [fullName, setFullName] = useState(profile?.full_name || "")
- const { toast } = useToast()
- const supabase = createBrowserClient()
+ const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
  const handleUpdateProfile = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -47,15 +46,12 @@ export function SettingsForm({ profile }: SettingsFormProps) {
 
    if (error) throw error
 
-   toast({
-    title: "Perfil atualizado",
+   toast.success("Perfil atualizado", {
     description: "Suas informações foram salvas com sucesso.",
    })
   } catch (error) {
-   toast({
-    title: "Erro ao atualizar",
+   toast.error("Erro ao atualizar", {
     description: "Não foi possível salvar as alterações.",
-    variant: "destructive",
    })
   } finally {
    setLoading(false)
@@ -63,37 +59,35 @@ export function SettingsForm({ profile }: SettingsFormProps) {
  }
 
  const handleDeleteAccount = async () => {
-  setDeleteLoading(true)
+  setDeleteLoading(true);
 
   try {
-   // Primeiro deletar todas as transações do usuário
-   await supabase.from("transactions").delete().eq("user_id", profile?.id)
+   const response = await fetch('/api/user', {
+    method: 'DELETE',
+   });
 
-   // Depois deletar todas as categorias do usuário
-   await supabase.from("categories").delete().eq("user_id", profile?.id)
+   if (!response.ok) {
+    const { error } = await response.json();
+    throw new Error(error || "Failed to delete account");
+   }
 
-   // Por fim, deletar o usuário (o perfil será deletado automaticamente via CASCADE)
-   const { error } = await supabase.auth.admin.deleteUser(profile?.id || "")
-
-   if (error) throw error
-
-   toast({
-    title: "Conta excluída",
+   toast.success("Conta excluída", {
     description: "Sua conta foi excluída permanentemente.",
-   })
+   });
 
-   // Redirecionar para página inicial
-   window.location.href = "/"
+   // Deslogar e redirecionar para a página inicial
+   await supabase.auth.signOut();
+   window.location.href = "/";
+
   } catch (error) {
-   toast({
-    title: "Erro ao excluir conta",
-    description: "Não foi possível excluir sua conta. Tente novamente.",
-    variant: "destructive",
-   })
+   const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
+   toast.error("Erro ao excluir conta", {
+    description: errorMessage,
+   });
   } finally {
-   setDeleteLoading(false)
+   setDeleteLoading(false);
   }
- }
+ };
 
  return (
   <div className="space-y-6">
@@ -151,9 +145,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
       <Button
        variant="outline"
        onClick={() => {
-        // Implementar mudança de senha via Supabase
-        toast({
-         title: "Em desenvolvimento",
+        toast.info("Em desenvolvimento", {
          description: "Esta funcionalidade será implementada em breve.",
         })
        }}

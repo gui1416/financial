@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LoginPage() {
@@ -19,7 +19,6 @@ export default function LoginPage() {
  const [error, setError] = useState<string | null>(null)
  const [isLoading, setIsLoading] = useState(false)
  const router = useRouter()
- const { toast } = useToast()
 
  const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -34,8 +33,7 @@ export default function LoginPage() {
    })
    if (error) throw error
 
-   toast({
-    title: "Login realizado com sucesso!",
+   toast.success("Login realizado com sucesso!", {
     description: "Redirecionando para o dashboard...",
    })
 
@@ -44,9 +42,7 @@ export default function LoginPage() {
    const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro"
    setError(errorMessage)
 
-   toast({
-    variant: "destructive",
-    title: "Erro no login",
+   toast.error("Erro no login", {
     description: errorMessage,
    })
   } finally {

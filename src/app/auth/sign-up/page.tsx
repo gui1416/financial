@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function SignUpPage() {
@@ -21,7 +21,6 @@ export default function SignUpPage() {
  const [error, setError] = useState<string | null>(null)
  const [isLoading, setIsLoading] = useState(false)
  const router = useRouter()
- const { toast } = useToast()
 
  const handleSignUp = async (e: React.FormEvent) => {
   e.preventDefault()
@@ -32,9 +31,7 @@ export default function SignUpPage() {
   if (password !== repeatPassword) {
    const errorMessage = "As senhas não coincidem"
    setError(errorMessage)
-   toast({
-    variant: "destructive",
-    title: "Erro na validação",
+   toast.error("Erro na validação", {
     description: errorMessage,
    })
    setIsLoading(false)
@@ -44,9 +41,7 @@ export default function SignUpPage() {
   if (password.length < 6) {
    const errorMessage = "A senha deve ter pelo menos 6 caracteres"
    setError(errorMessage)
-   toast({
-    variant: "destructive",
-    title: "Erro na validação",
+   toast.error("Erro na validação", {
     description: errorMessage,
    })
    setIsLoading(false)
@@ -66,8 +61,7 @@ export default function SignUpPage() {
    })
    if (error) throw error
 
-   toast({
-    title: "Conta criada com sucesso!",
+   toast.success("Conta criada com sucesso!", {
     description: "Verifique seu email para confirmar a conta.",
    })
 
@@ -76,9 +70,7 @@ export default function SignUpPage() {
    const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro"
    setError(errorMessage)
 
-   toast({
-    variant: "destructive",
-    title: "Erro ao criar conta",
+   toast.error("Erro ao criar conta", {
     description: errorMessage,
    })
   } finally {

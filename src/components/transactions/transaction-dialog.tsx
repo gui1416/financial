@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface Category {
  id: string
@@ -51,7 +51,6 @@ interface TransactionDialogProps {
 export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: TransactionDialogProps) {
  const [categories, setCategories] = useState<Category[]>([])
  const [isLoading, setIsLoading] = useState(false)
- const { toast } = useToast()
  const [formData, setFormData] = useState({
   title: "",
   description: "",
@@ -138,8 +137,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
 
     if (error) throw error
 
-    toast({
-     title: "Transação atualizada!",
+    toast.success("Transação atualizada!", {
      description: "A transação foi atualizada com sucesso.",
     })
    } else {
@@ -148,8 +146,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
 
     if (error) throw error
 
-    toast({
-     title: "Transação criada!",
+    toast.success("Transação criada!", {
      description: "A nova transação foi adicionada com sucesso.",
     })
    }
@@ -158,9 +155,7 @@ export function TransactionDialog({ open, onOpenChange, transaction, onSaved }: 
   } catch (error) {
    console.error("Error saving transaction:", error)
 
-   toast({
-    variant: "destructive",
-    title: "Erro ao salvar transação",
+   toast.error("Erro ao salvar transação", {
     description: error instanceof Error ? error.message : "Ocorreu um erro inesperado.",
    })
   } finally {
