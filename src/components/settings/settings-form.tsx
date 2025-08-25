@@ -75,8 +75,8 @@ export function SettingsForm({ profile }: SettingsFormProps) {
    });
 
    if (!response.ok) {
-    const { error } = await response.json();
-    throw new Error(error || "Failed to delete account");
+    const { error: errorResponse } = await response.json();
+    throw new Error(errorResponse || "Failed to delete account");
    }
 
    toast.success("Conta excluída", {
@@ -133,7 +133,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         type="url"
         value={avatarUrl}
         onChange={(e) => setAvatarUrl(e.target.value)}
-        placeholder="https://github.com/gui1416.png"
+        placeholder="https://exemplo.com/sua-foto.png"
        />
       </div>
 
