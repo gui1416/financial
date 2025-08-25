@@ -12,8 +12,8 @@ export default function SignUpSuccessPage() {
      </div>
      <Card>
       <CardHeader>
-       <CardTitle className="text-2xl">Obrigado por se cadastrar!</CardTitle>
-       <CardDescription>Verifique seu email para confirmar</CardDescription>
+       <CardTitle className="text-2xl text-center">Obrigado por se cadastrar!</CardTitle>
+       <CardDescription className="text-center">Verifique seu email para confirmar</CardDescription>
       </CardHeader>
       <CardContent>
        <div className="space-y-4">

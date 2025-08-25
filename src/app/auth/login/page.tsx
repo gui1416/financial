@@ -64,8 +64,8 @@ export default function LoginPage() {
      </div>
      <Card>
       <CardHeader>
-       <CardTitle className="text-2xl">Entrar</CardTitle>
-       <CardDescription>Digite seu email e senha para acessar sua conta</CardDescription>
+       <CardTitle className="text-2xl text-center">Entrar</CardTitle>
+       <CardDescription className="text-center">Digite seu email e senha para acessar sua conta</CardDescription>
       </CardHeader>
       <CardContent>
        <form onSubmit={handleLogin}>

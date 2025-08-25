@@ -74,8 +74,8 @@ function SignUpForm() {
  return (
   <Card>
    <CardHeader>
-    <CardTitle className="text-2xl">Criar conta</CardTitle>
-    <CardDescription>Preencha os dados para criar sua conta</CardDescription>
+    <CardTitle className="text-2xl text-center">Criar conta</CardTitle>
+    <CardDescription className="text-center">Preencha os dados para criar sua conta</CardDescription>
    </CardHeader>
    <CardContent>
     <Form {...form}>
@@ -182,8 +182,8 @@ export default function SignUpPage() {
      {!isAuthorized ? (
       <Card>
        <CardHeader>
-        <CardTitle className="text-2xl">Acesso ao Cadastro</CardTitle>
-        <CardDescription>Digite a senha de convite para continuar.</CardDescription>
+        <CardTitle className="text-2xl text-center">Acesso ao Cadastro</CardTitle>
+        <CardDescription className="text-center">Digite a senha de convite para continuar.</CardDescription>
        </CardHeader>
        <CardContent>
         <form onSubmit={handleInviteCodeCheck} className="space-y-4">
