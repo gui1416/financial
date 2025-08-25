@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,10 +10,11 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useForm, ControllerRenderProps } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Label } from "@/components/ui/label"
 
 const formSchema = z.object({
  fullName: z.string().min(3, { message: "O nome completo é obrigatório." }),
@@ -26,7 +28,7 @@ const formSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof formSchema>;
 
-export default function SignUpPage() {
+function SignUpForm() {
  const router = useRouter()
  const form = useForm<SignUpFormValues>({
   resolver: zodResolver(formSchema),
@@ -70,6 +72,101 @@ export default function SignUpPage() {
  }
 
  return (
+  <Card>
+   <CardHeader>
+    <CardTitle className="text-2xl">Criar conta</CardTitle>
+    <CardDescription>Preencha os dados para criar sua conta</CardDescription>
+   </CardHeader>
+   <CardContent>
+    <Form {...form}>
+     <form onSubmit={form.handleSubmit(handleSignUp)}>
+      <div className="flex flex-col gap-4">
+       <FormField
+        control={form.control}
+        name="fullName"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Nome completo</FormLabel>
+          <FormControl>
+           <Input placeholder="Seu nome completo" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+       <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+           <Input type="email" placeholder="seu@email.com" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+       <FormField
+        control={form.control}
+        name="password"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Senha</FormLabel>
+          <FormControl>
+           <Input type="password" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+       <FormField
+        control={form.control}
+        name="repeatPassword"
+        render={({ field }) => (
+         <FormItem>
+          <FormLabel>Confirmar senha</FormLabel>
+          <FormControl>
+           <Input type="password" {...field} />
+          </FormControl>
+          <FormMessage />
+         </FormItem>
+        )}
+       />
+
+       <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
+        {isSubmitting ? "Criando conta..." : "Criar conta"}
+       </Button>
+      </div>
+      <div className="mt-4 text-center text-sm">
+       Já tem uma conta?{" "}
+       <Link href="/auth/login" className="underline underline-offset-4">
+        Entrar
+       </Link>
+      </div>
+     </form>
+    </Form>
+   </CardContent>
+  </Card>
+ )
+}
+
+
+export default function SignUpPage() {
+ const [inviteCode, setInviteCode] = useState("");
+ const [isAuthorized, setIsAuthorized] = useState(false);
+
+ const handleInviteCodeCheck = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (inviteCode === process.env.NEXT_PUBLIC_SIGNUP_INVITE_CODE) {
+   setIsAuthorized(true);
+   toast.success("Acesso autorizado!");
+  } else {
+   toast.error("Senha de convite inválida.");
+  }
+ };
+
+ return (
   <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-background">
    <div className="absolute top-4 right-4">
     <ThemeToggle />
@@ -81,82 +178,41 @@ export default function SignUpPage() {
       <h1 className="text-2xl font-bold text-foreground">FinanceApp</h1>
       <p className="text-muted-foreground">Gerencie seus gastos pessoais</p>
      </div>
-     <Card>
-      <CardHeader>
-       <CardTitle className="text-2xl">Criar conta</CardTitle>
-       <CardDescription>Preencha os dados para criar sua conta</CardDescription>
-      </CardHeader>
-      <CardContent>
-       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSignUp)}>
-         <div className="flex flex-col gap-4">
-          <FormField
-           control={form.control}
-           name="fullName"
-           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "fullName"> }) => (
-            <FormItem>
-             <FormLabel>Nome completo</FormLabel>
-             <FormControl>
-              <Input placeholder="Seu nome completo" {...field} />
-             </FormControl>
-             <FormMessage />
-            </FormItem>
-           )}
-          />
-          <FormField
-           control={form.control}
-           name="email"
-           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "email"> }) => (
-            <FormItem>
-             <FormLabel>Email</FormLabel>
-             <FormControl>
-              <Input type="email" placeholder="seu@email.com" {...field} />
-             </FormControl>
-             <FormMessage />
-            </FormItem>
-           )}
-          />
-          <FormField
-           control={form.control}
-           name="password"
-           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "password"> }) => (
-            <FormItem>
-             <FormLabel>Senha</FormLabel>
-             <FormControl>
-              <Input type="password" {...field} />
-             </FormControl>
-             <FormMessage />
-            </FormItem>
-           )}
-          />
-          <FormField
-           control={form.control}
-           name="repeatPassword"
-           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "repeatPassword"> }) => (
-            <FormItem>
-             <FormLabel>Confirmar senha</FormLabel>
-             <FormControl>
-              <Input type="password" {...field} />
-             </FormControl>
-             <FormMessage />
-            </FormItem>
-           )}
-          />
 
-          <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
-           {isSubmitting ? "Criando conta..." : "Criar conta"}
-          </Button>
+     {!isAuthorized ? (
+      <Card>
+       <CardHeader>
+        <CardTitle className="text-2xl">Acesso ao Cadastro</CardTitle>
+        <CardDescription>Digite a senha de convite para continuar.</CardDescription>
+       </CardHeader>
+       <CardContent>
+        <form onSubmit={handleInviteCodeCheck} className="space-y-4">
+         <div className="grid gap-2">
+          <Label htmlFor="invite-code">Senha de Convite</Label>
+          <Input
+           id="invite-code"
+           type="password"
+           value={inviteCode}
+           onChange={(e) => setInviteCode(e.target.value)}
+           required
+          />
          </div>
-         <div className="mt-4 text-center text-sm">
+         <Button type="submit" className="w-full">
+          Autorizar
+         </Button>
+         <div className="mt-2 text-center text-sm">
           Já tem uma conta?{" "}
           <Link href="/auth/login" className="underline underline-offset-4">
            Entrar
           </Link>
          </div>
         </form>
-       </Form>
-      </CardContent>
-     </Card>
+       </CardContent>
+      </Card>
+     ) : (
+      <SignUpForm />
+     )}
+
     </div>
    </div>
   </div>
