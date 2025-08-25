@@ -9,10 +9,10 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useForm } from "react-hook-form"
+import { useForm, ControllerRenderProps } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form" // Supondo que você crie este componente wrapper
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
 const formSchema = z.object({
  fullName: z.string().min(3, { message: "O nome completo é obrigatório." }),
@@ -93,7 +93,7 @@ export default function SignUpPage() {
           <FormField
            control={form.control}
            name="fullName"
-           render={({ field }: { field: any }) => (
+           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "fullName"> }) => (
             <FormItem>
              <FormLabel>Nome completo</FormLabel>
              <FormControl>
@@ -106,7 +106,7 @@ export default function SignUpPage() {
           <FormField
            control={form.control}
            name="email"
-           render={({ field }: { field: any }) => (
+           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "email"> }) => (
             <FormItem>
              <FormLabel>Email</FormLabel>
              <FormControl>
@@ -119,7 +119,7 @@ export default function SignUpPage() {
           <FormField
            control={form.control}
            name="password"
-           render={({ field }: { field: any }) => (
+           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "password"> }) => (
             <FormItem>
              <FormLabel>Senha</FormLabel>
              <FormControl>
@@ -132,7 +132,7 @@ export default function SignUpPage() {
           <FormField
            control={form.control}
            name="repeatPassword"
-           render={({ field }: { field: any }) => (
+           render={({ field }: { field: ControllerRenderProps<SignUpFormValues, "repeatPassword"> }) => (
             <FormItem>
              <FormLabel>Confirmar senha</FormLabel>
              <FormControl>

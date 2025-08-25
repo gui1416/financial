@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, ElementType } from "react"
 import {
   LayoutDashboard,
   CreditCard,
@@ -24,7 +22,15 @@ import {
 } from "lucide-react"
 import { NavUser } from "@/components/nav-user"
 
-const mainNavigation = [
+interface NavItemProps {
+  name: string;
+  href: string;
+  icon: ElementType;
+  badge?: string;
+}
+
+
+const mainNavigation: NavItemProps[] = [
   {
     name: "Dashboard",
     href: "/dashboard",
@@ -43,7 +49,7 @@ const mainNavigation = [
   },
 ]
 
-const analyticsNavigation = [
+const analyticsNavigation: NavItemProps[] = [
   {
     name: "Metas",
     href: "/dashboard/goals",
@@ -56,7 +62,7 @@ const analyticsNavigation = [
   },
 ]
 
-const supportNavigation = [
+const supportNavigation: NavItemProps[] = [
   {
     name: "Ajuda",
     href: "/dashboard/help",
@@ -75,7 +81,6 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -100,13 +105,7 @@ export function Sidebar({ className }: SidebarProps) {
     window.dispatchEvent(event)
   }, [isCollapsed])
 
-  const handleSignOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/auth/login")
-  }
-
-  const NavItem = ({ item, isActive }: { item: any; isActive: boolean }) => (
+  const NavItem = ({ item, isActive }: { item: NavItemProps; isActive: boolean }) => (
     <Link
       href={item.href}
       className={cn(

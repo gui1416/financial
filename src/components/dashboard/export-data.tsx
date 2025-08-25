@@ -18,6 +18,38 @@ import { toast } from "sonner"
 import { Download, Loader2, FileText, FileSpreadsheet } from "lucide-react"
 import { createBrowserClient } from "@/lib/supabase/client"
 
+interface ExportData {
+  transactions?: Transaction[];
+  categories?: Category[];
+}
+
+interface Transaction {
+  id: string;
+  title: string;
+  description: string | null;
+  amount: number;
+  type: "income" | "expense";
+  date: string;
+  created_at: string;
+  categories: {
+    name: string;
+    type: string;
+    color: string;
+    icon: string;
+  }[] | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  type: "income" | "expense";
+  created_at: string;
+  user_id: string;
+}
+
+
 export function ExportData() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -43,9 +75,8 @@ export function ExportData() {
         dateFilter = daysAgo.toISOString().split("T")[0]
       }
 
-      const exportData: any = {}
+      const exportData: ExportData = {}
 
-      // Exportar transações
       if (includeTransactions) {
         let query = supabase
           .from("transactions")
@@ -77,7 +108,6 @@ export function ExportData() {
         exportData.transactions = transactions
       }
 
-      // Exportar categorias
       if (includeCategories) {
         const { data: categories, error: categoriesError } = await supabase
           .from("categories")
@@ -89,7 +119,6 @@ export function ExportData() {
         exportData.categories = categories
       }
 
-      // Gerar arquivo
       if (format === "json") {
         downloadJSON(exportData)
       } else {
@@ -110,7 +139,7 @@ export function ExportData() {
     }
   }
 
-  const downloadJSON = (data: any) => {
+  const downloadJSON = (data: ExportData) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -122,7 +151,7 @@ export function ExportData() {
     URL.revokeObjectURL(url)
   }
 
-  const downloadCSV = (data: any) => {
+  const downloadCSV = (data: ExportData) => {
     if (data.transactions) {
       const csvContent = convertToCSV(data.transactions)
       const blob = new Blob([csvContent], { type: "text/csv" })
@@ -137,7 +166,7 @@ export function ExportData() {
     }
   }
 
-  const convertToCSV = (transactions: any[]) => {
+  const convertToCSV = (transactions: Transaction[]) => {
     const headers = ["Data", "Título", "Descrição", "Valor", "Tipo", "Categoria"]
     const rows = transactions.map((t) => [
       t.date,
@@ -145,7 +174,7 @@ export function ExportData() {
       t.description || "",
       t.amount,
       t.type === "income" ? "Receita" : "Despesa",
-      t.categories?.name || "Sem categoria",
+      t.categories?.[0]?.name || "Sem categoria",
     ])
 
     return [headers, ...rows].map((row) => row.map((field) => `"${field}"`).join(",")).join("\n")

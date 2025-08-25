@@ -20,10 +20,21 @@ interface NavUserProps {
  isCollapsed?: boolean
 }
 
+interface User {
+ id: string;
+ email?: string;
+}
+
+interface Profile {
+ full_name?: string;
+ avatar_url?: string;
+}
+
+
 export function NavUser({ isCollapsed = false }: NavUserProps) {
  const router = useRouter()
- const [user, setUser] = useState<any>(null)
- const [profile, setProfile] = useState<any>(null)
+ const [user, setUser] = useState<User | null>(null)
+ const [profile, setProfile] = useState<Profile | null>(null)
 
  useEffect(() => {
   const getUser = async () => {
@@ -35,7 +46,6 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
    if (user) {
     setUser(user)
 
-    // Get user profile
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
     setProfile(profile)
@@ -103,7 +113,7 @@ export function NavUser({ isCollapsed = false }: NavUserProps) {
      >
       <div className="flex items-center gap-3 min-w-0 flex-1">
        <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} alt={displayName} />
+        <AvatarImage src={profile?.avatar_url || "https://github.com/gui1416.png"} alt={displayName} />
         <AvatarFallback className="bg-primary text-primary-foreground">
          {displayName.charAt(0).toUpperCase()}
         </AvatarFallback>

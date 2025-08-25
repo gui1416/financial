@@ -40,15 +40,12 @@ export function GoalDialog({ open, onOpenChange }: GoalDialogProps) {
   setLoading(true)
 
   try {
-   // Aqui você implementaria a lógica para salvar a meta no banco de dados
-   // Por enquanto, apenas simular o salvamento
    await new Promise((resolve) => setTimeout(resolve, 1000))
 
    toast.success("Meta criada", {
     description: "Sua nova meta foi criada com sucesso.",
    })
 
-   // Reset form
    setFormData({
     title: "",
     description: "",
@@ -59,7 +56,7 @@ export function GoalDialog({ open, onOpenChange }: GoalDialogProps) {
    })
 
    onOpenChange(false)
-  } catch (error) {
+  } catch {
    toast.error("Erro ao criar meta", {
     description: "Não foi possível criar a meta. Tente novamente.",
    })

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { createClient } from "@/lib/supabase/client" // Importação correta
+import { createClient } from "@/lib/supabase/client"
 import { Loader2, User, Shield, Trash2 } from "lucide-react"
 import {
  AlertDialog,
@@ -36,7 +36,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
  const [deleteLoading, setDeleteLoading] = useState(false)
  const [fullName, setFullName] = useState(profile?.full_name || "")
 
- // CORREÇÃO APLICADA AQUI: Usando a função auxiliar que já tem as chaves.
  const supabase = createClient()
 
  const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -51,7 +50,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
    toast.success("Perfil atualizado", {
     description: "Suas informações foram salvas com sucesso.",
    })
-  } catch (error) {
+  } catch {
    toast.error("Erro ao atualizar", {
     description: "Não foi possível salvar as alterações.",
    })
@@ -77,7 +76,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
     description: "Sua conta foi excluída permanentemente.",
    });
 
-   // Deslogar e redirecionar para a página inicial
    await supabase.auth.signOut();
    window.location.href = "/";
 
@@ -94,7 +92,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
 
  return (
   <div className="space-y-6">
-   {/* Informações Pessoais */}
    <Card>
     <CardHeader>
      <CardTitle className="flex items-center gap-2">
@@ -130,7 +127,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
     </CardContent>
    </Card>
 
-   {/* Segurança */}
    <Card>
     <CardHeader>
      <CardTitle className="flex items-center gap-2">
@@ -159,7 +155,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
     </CardContent>
    </Card>
 
-   {/* Zona de Perigo */}
    <Card className="border-destructive">
     <CardHeader>
      <CardTitle className="flex items-center gap-2 text-destructive">

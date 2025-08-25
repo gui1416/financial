@@ -63,7 +63,7 @@ export function DeleteTransactionDialog({ open, onOpenChange, transaction, onDel
     <AlertDialogHeader>
      <AlertDialogTitle>Excluir transação</AlertDialogTitle>
      <AlertDialogDescription>
-      Tem certeza que deseja excluir a transação "{transaction?.title}" no valor de{" "}
+      Tem certeza que deseja excluir a transação &quot;{transaction?.title}&quot; no valor de{" "}
       {transaction && formatCurrency(transaction.amount)}? Esta ação não pode ser desfeita.
      </AlertDialogDescription>
     </AlertDialogHeader>

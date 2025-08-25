@@ -39,10 +39,8 @@ export function DeleteCategoryDialog({ open, onOpenChange, category, onDeleted }
   const supabase = createClient()
 
   try {
-   // First, update all transactions to remove the category reference
    await supabase.from("transactions").update({ category_id: null }).eq("category_id", category.id)
 
-   // Then delete the category
    const { error } = await supabase.from("categories").delete().eq("id", category.id)
 
    if (error) throw error
@@ -63,7 +61,7 @@ export function DeleteCategoryDialog({ open, onOpenChange, category, onDeleted }
     <AlertDialogHeader>
      <AlertDialogTitle>Excluir categoria</AlertDialogTitle>
      <AlertDialogDescription>
-      Tem certeza que deseja excluir a categoria "{category?.name}"?
+      Tem certeza que deseja excluir a categoria &quot;{category?.name}&quot;?
       {transactionCount > 0 && (
        <>
         <br />
