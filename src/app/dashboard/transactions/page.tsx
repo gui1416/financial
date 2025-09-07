@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { TransactionsTable } from "@/components/transactions/transactions-table"
-import { TransactionsFilters } from "@/components/transactions/transactions-filters"
 
 export default async function TransactionsPage() {
  const supabase = await createClient()
@@ -18,11 +17,15 @@ export default async function TransactionsPage() {
  return (
   <>
    <DashboardHeader />
-   <div className="flex items-center justify-between space-y-2">
-    <h2 className="text-3xl font-bold tracking-tight">Transações</h2>
-   </div>
    <div className="space-y-4">
-    <TransactionsFilters />
+    <div className="flex items-center justify-between space-y-2">
+     <div>
+      <h2 className="text-3xl font-bold tracking-tight">Transações</h2>
+      <p className="text-muted-foreground">
+       Gerencie suas receitas e despesas.
+      </p>
+     </div>
+    </div>
     <TransactionsTable />
    </div>
   </>

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from "recharts"
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, BarChart, Bar } from "recharts"
 import { createClient } from "@/lib/supabase/client"
 import { useQuery } from "@tanstack/react-query"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -18,11 +18,11 @@ interface ChartData {
 const chartConfig = {
  income: {
   label: "Receitas",
-  color: "hsl(var(--chart-1))",
+  color: "var(--chart-1)",
  },
  expenses: {
   label: "Gastos",
-  color: "hsl(var(--chart-2))",
+  color: "var(--chart-2)",
  },
 }
 
@@ -103,12 +103,10 @@ export function TransactionsChart() {
      <CardDescription>Receitas e gastos no período selecionado</CardDescription>
     </div>
     <Select value={String(period)} onValueChange={(value) => setPeriod(Number(value))}>
-     {/* CORREÇÃO: Largura do botão ajustada e placeholder removido */}
      <SelectTrigger className="w-auto">
       <SelectValue />
      </SelectTrigger>
      <SelectContent>
-      {/* CORREÇÃO: Texto dos itens do menu agora é responsivo */}
       <SelectItem value="7">{isMobile ? "7 dias" : "Últimos 7 dias"}</SelectItem>
       <SelectItem value="30">{isMobile ? "30 dias" : "Últimos 30 dias"}</SelectItem>
       <SelectItem value="90">{isMobile ? "90 dias" : "Últimos 90 dias"}</SelectItem>
@@ -118,17 +116,7 @@ export function TransactionsChart() {
    <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
     <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
      <ResponsiveContainer>
-      <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: isMobile ? 30 : 10 }}>
-       <defs>
-        <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-         <stop offset="5%" stopColor="var(--color-income)" stopOpacity={0.8} />
-         <stop offset="95%" stopColor="var(--color-income)" stopOpacity={0.1} />
-        </linearGradient>
-        <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-         <stop offset="5%" stopColor="var(--color-expenses)" stopOpacity={0.8} />
-         <stop offset="95%" stopColor="var(--color-expenses)" stopOpacity={0.1} />
-        </linearGradient>
-       </defs>
+      <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: isMobile ? 30 : 10 }}>
        <CartesianGrid vertical={false} strokeDasharray="3 3" />
        <XAxis
         dataKey="date"
@@ -151,24 +139,21 @@ export function TransactionsChart() {
          }).format(value as number)
         }
        />
-       <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-       <Area
-        type="monotone"
+       <ChartTooltip
+        cursor={{ fill: "hsl(var(--muted))", opacity: 0.5 }}
+        content={<ChartTooltipContent />}
+       />
+       <Bar
         dataKey="income"
-        stackId="1"
-        stroke="var(--color-income)"
-        strokeWidth={2}
-        fill="url(#colorIncome)"
+        fill="var(--color-income)"
+        radius={[4, 4, 0, 0]} // Deixa as barras com cantos arredondados no topo
        />
-       <Area
-        type="monotone"
+       <Bar
         dataKey="expenses"
-        stackId="1"
-        stroke="var(--color-expenses)"
-        strokeWidth={2}
-        fill="url(#colorExpenses)"
+        fill="var(--color-expenses)"
+        radius={[4, 4, 0, 0]} // Deixa as barras com cantos arredondados no topo
        />
-      </AreaChart>
+      </BarChart>
      </ResponsiveContainer>
     </ChartContainer>
    </CardContent>
