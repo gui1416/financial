@@ -22,13 +22,6 @@ export interface Transaction {
  }[] | null;
 }
 
-declare module '@tanstack/react-table' {
- interface TableMeta<TData extends RowData> {
-  onEdit: (transaction: Transaction) => void;
-  onDelete: (transaction: Transaction) => void;
- }
-}
-
 export const columns: ColumnDef<Transaction>[] = [
  {
   id: "select",

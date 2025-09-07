@@ -1,3 +1,5 @@
+// src/components/transactions/transaction-form.tsx
+
 "use client"
 
 import * as React from "react"
@@ -26,7 +28,7 @@ interface Category {
 }
 
 interface TransactionFormProps {
- transaction?: Transaction | null // Agora é opcional
+ transaction?: Transaction | null
  onSaved: () => void;
  onCancel: () => void;
 }
@@ -39,7 +41,7 @@ export function TransactionForm({ transaction, onSaved, onCancel }: TransactionF
   description: transaction?.description || "",
   amount: transaction?.amount.toString() || "",
   type: transaction?.type || "expense",
-  categoryId: transaction?.categories?.id || "",
+  categoryId: transaction?.categories?.[0]?.id || "",
   date: transaction ? new Date(transaction.date + 'T00:00:00') : new Date(),
  })
 

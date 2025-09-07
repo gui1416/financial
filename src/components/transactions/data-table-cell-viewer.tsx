@@ -63,7 +63,7 @@ export function DataTableCelViewer({ transaction, onSaved }: DataTableCelViewerP
     description: transaction.description || "",
     amount: transaction.amount.toString(),
     type: transaction.type,
-    categoryId: transaction.categories?.id || "",
+    categoryId: transaction.categories?.[0]?.id || "",
     date: new Date(transaction.date + 'T00:00:00'),
    })
   }
