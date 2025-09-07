@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, BarChart, Bar } from "recharts"
+import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, BarChart, Bar } from "recharts"
 import { createClient } from "@/lib/supabase/client"
 import { useQuery } from "@tanstack/react-query"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -146,12 +146,12 @@ export function TransactionsChart() {
        <Bar
         dataKey="income"
         fill="var(--color-income)"
-        radius={[4, 4, 0, 0]} // Deixa as barras com cantos arredondados no topo
+        radius={[4, 4, 0, 0]}
        />
        <Bar
         dataKey="expenses"
         fill="var(--color-expenses)"
-        radius={[4, 4, 0, 0]} // Deixa as barras com cantos arredondados no topo
+        radius={[4, 4, 0, 0]}
        />
       </BarChart>
      </ResponsiveContainer>

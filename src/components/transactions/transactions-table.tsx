@@ -1,5 +1,3 @@
-// Em src/components/transactions/transactions-table.tsx
-
 "use client"
 
 import * as React from "react"
@@ -13,7 +11,7 @@ import { DeleteTransactionDialog } from "./delete-transaction-dialog"
 import { TransactionForm } from "./transaction-form"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer"
 import type { Transaction } from "./columns"
-import { useMediaQuery } from "@/hooks/use-media-query" // IMPORTAÇÃO CORRIGIDA
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface TransactionsTableProps {
   filters?: {
@@ -54,7 +52,7 @@ const fetchTransactions = async (filters: TransactionsTableProps['filters']) => 
 
   const { data, error } = await query
   if (error) throw error
-  return data as Transaction[]
+  return data as unknown as Transaction[]
 }
 
 export function TransactionsTable({ filters }: TransactionsTableProps) {

@@ -1,5 +1,3 @@
-// Em src/components/transactions/columns.tsx
-
 "use client"
 
 import { ColumnDef, RowData } from "@tanstack/react-table"
@@ -21,7 +19,7 @@ export interface Transaction {
   id: string
   name: string
   color: string;
- } | null;
+ }[] | null;
 }
 
 declare module '@tanstack/react-table' {
@@ -76,7 +74,7 @@ export const columns: ColumnDef<Transaction>[] = [
    <DataTableColumnHeader column={column} title="Categoria" />
   ),
   cell: ({ row }) => {
-   const category = row.original.categories;
+   const category = row.original.categories?.[0];
    if (!category) {
     return <span className="text-muted-foreground">Sem categoria</span>
    }
@@ -91,7 +89,7 @@ export const columns: ColumnDef<Transaction>[] = [
    )
   },
   filterFn: (row, id, value) => {
-   const category = row.original.categories;
+   const category = row.original.categories?.[0];
    return value.includes(category?.id)
   },
  },

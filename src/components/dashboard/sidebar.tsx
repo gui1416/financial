@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { useEffect, ElementType } from "react"
+import { ElementType } from "react"
 import {
   LayoutDashboard,
   CreditCard,
